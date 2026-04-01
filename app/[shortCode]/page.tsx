@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { PasswordUnlockForm } from "@/components/password-unlock-form";
 import { recordClick } from "@/lib/analytics";
-import { db } from "@/lib/db";
+import { db, ensureDatabaseReady } from "@/lib/db";
 
 type RedirectPageProps = {
   params: Promise<{
@@ -12,6 +12,8 @@ type RedirectPageProps = {
 };
 
 export default async function RedirectPage({ params }: RedirectPageProps) {
+  await ensureDatabaseReady();
+
   const { shortCode } = await params;
   const link = await db.link.findUnique({
     where: {

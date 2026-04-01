@@ -12,6 +12,26 @@ export function generateManageToken() {
   return createManageToken();
 }
 
+function resolveBaseUrl(input?: string) {
+  if (input && input.trim().length > 0) {
+    return input.trim().replace(/\/$/, "");
+  }
+
+  if (process.env.NEXT_PUBLIC_APP_URL && process.env.NEXT_PUBLIC_APP_URL.trim().length > 0) {
+    return process.env.NEXT_PUBLIC_APP_URL.trim().replace(/\/$/, "");
+  }
+
+  if (process.env.NETLIFY_URL && process.env.NETLIFY_URL.trim().length > 0) {
+    const netlifyUrl = process.env.NETLIFY_URL.trim();
+    const withProtocol = netlifyUrl.startsWith("http://") || netlifyUrl.startsWith("https://")
+      ? netlifyUrl
+      : `https://${netlifyUrl}`;
+    return withProtocol.replace(/\/$/, "");
+  }
+
+  return "http://localhost:3000";
+}
+
 export function normalizeUrl(input: string) {
   const value = input.trim();
   const parsed = new URL(value);
@@ -73,12 +93,12 @@ export function normalizeExpiresAt(input: string | null | undefined) {
   return parsed;
 }
 
-export function buildShortUrl(shortCode: string) {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  return `${base.replace(/\/$/, "")}/${shortCode}`;
+export function buildShortUrl(shortCode: string, baseUrl?: string) {
+  const base = resolveBaseUrl(baseUrl);
+  return `${base}/${shortCode}`;
 }
 
-export function buildManageUrl(token: string) {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  return `${base.replace(/\/$/, "")}/manage/${token}`;
+export function buildManageUrl(token: string, baseUrl?: string) {
+  const base = resolveBaseUrl(baseUrl);
+  return `${base}/manage/${token}`;
 }

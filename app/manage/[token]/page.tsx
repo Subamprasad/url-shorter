@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { ManageLinkForm } from "@/components/manage-link-form";
-import { db } from "@/lib/db";
+import { db, ensureDatabaseReady } from "@/lib/db";
 import { buildShortUrl } from "@/lib/urls";
 import { hashValue } from "@/lib/security";
 
@@ -12,6 +12,8 @@ type ManagePageProps = {
 };
 
 export default async function ManagePage({ params }: ManagePageProps) {
+  await ensureDatabaseReady();
+
   const { token } = await params;
   const link = await db.link.findUnique({
     where: {

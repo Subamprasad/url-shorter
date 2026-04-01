@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { recordClick } from "@/lib/analytics";
-import { db } from "@/lib/db";
+import { db, ensureDatabaseReady } from "@/lib/db";
 import { assertRateLimit } from "@/lib/rate-limit";
 import { getClientIp, hashValue } from "@/lib/security";
 
@@ -13,6 +13,8 @@ type UnlockRouteProps = {
 
 export async function POST(request: Request, context: UnlockRouteProps) {
   try {
+    await ensureDatabaseReady();
+
     const { shortCode } = await context.params;
     const ip = getClientIp(request) ?? "anonymous";
     assertRateLimit(`unlock:${shortCode}:${ip}`);

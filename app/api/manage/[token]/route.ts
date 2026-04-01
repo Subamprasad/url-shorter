@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { db } from "@/lib/db";
+import { db, ensureDatabaseReady } from "@/lib/db";
 import { hashValue } from "@/lib/security";
 import { normalizeExpiresAt, normalizePassword, normalizeUrl } from "@/lib/urls";
 
@@ -11,6 +11,8 @@ type ManageRouteProps = {
 };
 
 async function getLinkIdFromToken(token: string) {
+  await ensureDatabaseReady();
+
   const link = await db.link.findUnique({
     where: {
       manageTokenHash: hashValue(token)
@@ -25,6 +27,8 @@ async function getLinkIdFromToken(token: string) {
 
 export async function PATCH(request: Request, context: ManageRouteProps) {
   try {
+    await ensureDatabaseReady();
+
     const { token } = await context.params;
     const linkId = await getLinkIdFromToken(token);
 
@@ -81,6 +85,8 @@ export async function PATCH(request: Request, context: ManageRouteProps) {
 }
 
 export async function DELETE(_request: Request, context: ManageRouteProps) {
+  await ensureDatabaseReady();
+
   const { token } = await context.params;
   const linkId = await getLinkIdFromToken(token);
 

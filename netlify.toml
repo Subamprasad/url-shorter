@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+  DATABASE_URL = "file:/tmp/url-shortener.db"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 
-import { db } from "@/lib/db";
+import { db, ensureDatabaseReady } from "@/lib/db";
 import { assertRateLimit } from "@/lib/rate-limit";
 import {
   buildManageUrl,
@@ -17,6 +17,8 @@ import { getClientIp, hashValue } from "@/lib/security";
 
 export async function POST(request: Request) {
   try {
+    await ensureDatabaseReady();
+
     const ip = getClientIp(request) ?? "anonymous";
     assertRateLimit(`create:${ip}`);
 
@@ -41,6 +43,7 @@ export async function POST(request: Request) {
     const customAlias = body.customAlias ? normalizeAlias(body.customAlias) : null;
     const password = body.password ? normalizePassword(body.password) : null;
     const expiresAt = normalizeExpiresAt(body.expiresAt);
+    const requestOrigin = new URL(request.url).origin;
     const shortCode = customAlias ?? generateShortCode();
     const manageToken = generateManageToken();
 
@@ -61,8 +64,8 @@ export async function POST(request: Request) {
         id: createdLink.id,
         originalUrl: createdLink.originalUrl,
         shortCode: createdLink.shortCode,
-        shortUrl: buildShortUrl(createdLink.shortCode),
-        manageUrl: buildManageUrl(manageToken),
+        shortUrl: buildShortUrl(createdLink.shortCode, requestOrigin),
+        manageUrl: buildManageUrl(manageToken, requestOrigin),
         expiresAt: createdLink.expiresAt?.toISOString() ?? null,
         passwordProtected: Boolean(createdLink.passwordHash),
         createdAt: createdLink.createdAt.toISOString()
