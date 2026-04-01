@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import os from "node:os";
+import path from "node:path";
 
 declare global {
   var prisma: PrismaClient | undefined;
@@ -6,12 +8,29 @@ declare global {
 }
 
 function resolveDatabaseUrl() {
-  if (process.env.DATABASE_URL && process.env.DATABASE_URL.trim().length > 0) {
-    return process.env.DATABASE_URL;
+  const configured = process.env.DATABASE_URL?.trim();
+  const runtimeTmpFile = `file:${path.join(os.tmpdir(), "url-shortener.db").replace(/\\/g, "/")}`;
+  const isNetlifyRuntime = Boolean(process.env.NETLIFY || process.env.URL || process.env.DEPLOY_PRIME_URL);
+
+  if (isNetlifyRuntime) {
+    if (!configured) {
+      return runtimeTmpFile;
+    }
+
+    const isExternalDb =
+      configured.startsWith("postgres://") ||
+      configured.startsWith("postgresql://") ||
+      configured.startsWith("mysql://") ||
+      configured.startsWith("sqlserver://") ||
+      configured.startsWith("file:/tmp/") ||
+      configured.startsWith("file:C:/") ||
+      configured.startsWith("file:/var/");
+
+    return isExternalDb ? configured : runtimeTmpFile;
   }
 
-  if (process.env.NETLIFY) {
-    return "file:/tmp/url-shortener.db";
+  if (configured && configured.length > 0) {
+    return configured;
   }
 
   return "file:./dev.db";
