@@ -9,11 +9,11 @@ export default function HomePage() {
             LinkNova Pro
           </p>
           <h1 className="mt-4 font-display text-4xl leading-tight text-[#1f2c3f] sm:text-5xl">
-            Smart URL Shortener
+            Smart URL Shortener with QR Code, Password & Expiry
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-[#1f2c3f]/70 sm:text-base">
-            Enable only the options you need. Password lock, expiration scheduling, and instant QR export all work in
-            real time.
+            This smart URL shortener lets you create secure links with QR code generation, password protection, and
+            link expiration.
           </p>
         </div>
         <CreateLinkForm />

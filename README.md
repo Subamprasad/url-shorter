@@ -3,6 +3,8 @@
 Anonymous URL shortener built with Next.js, TypeScript, Tailwind CSS, Prisma, and SQLite.
 try this https://url-shoter-link.netlify.app/
 
+Live URL: https://url-shoter-link.netlify.app/
+
 ## Features
 
 - Create short URLs without creating an account
